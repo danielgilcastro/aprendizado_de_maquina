@@ -10,5 +10,8 @@ __pycache__/
 venv/
 env/
 
+# Arquivos intermediários de geração e conferência dos materiais
+/tmp/
+
 .DS_Store
 Thumbs.db

@@ -1,0 +1,5 @@
+# Preserva arquivos binários sem conversão de quebras de linha.
+*.pdf binary
+*.jpeg binary
+*.jpg binary
+*.png binary
