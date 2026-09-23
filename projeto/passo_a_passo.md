@@ -12,6 +12,8 @@ Este roteiro segue as seis seções do enunciado `Projeto_disciplina.pdf`. A pro
 4. Execute as células de cima para baixo com `Shift + Enter`.
 5. Leia as saídas, responda às perguntas finais nas células de texto e salve o notebook.
 
+Depois de concluir a auditoria, continue em [passo_2_qualidade_vinhos.ipynb](passo_2_qualidade_vinhos.ipynb). Ele usa os CSVs locais e pode ser executado com um kernel novo, sem depender das variáveis do primeiro notebook.
+
 No Windows, a partir da raiz do repositório:
 
 ```powershell
@@ -55,6 +57,8 @@ Neste primeiro passo, os dados originais são mantidos: a limpeza e o treinament
 
 ## Passo 2 — Preparar os dados e ajustar a primeira regressão
 
+**Arquivo desta etapa:** [passo_2_qualidade_vinhos.ipynb](passo_2_qualidade_vinhos.ipynb).
+
 **Ajuda a escrever:** seções 1 e 2; primeiro resultado para a seção 3.
 
 **Corresponde à tarefa da Aula 2:** completar a auditoria e ajustar uma reta em uma coluna numérica. Aqui, essa coluna é o próprio alvo `quality`.
@@ -65,13 +69,16 @@ Neste primeiro passo, os dados originais são mantidos: a limpeza e o treinament
 4. Investigar também linhas com entradas iguais e notas diferentes. Remover duplicatas completas não elimina esses casos. Se for necessário impedir que perfis idênticos se espalhem entre partições, usar uma divisão por grupos de entradas.
 5. Definir `X = base.drop(columns="quality")` e `y = base["quality"]`.
 6. Reservar aproximadamente 20% dos dados para teste final, com semente fixa (`random_state=42`). Se usar divisão aleatória por linha, preservar a distribuição das notas com `stratify=y`.
-7. Codificar `wine_type` e padronizar as medidas em um `Pipeline`. As transformações devem ser ajustadas somente no treino.
-8. Ajustar uma `LinearRegression` e verificar suas previsões na validação do treino.
-9. Examinar os coeficientes e discutir três variáveis em que o modelo se apoia. Em variáveis padronizadas, o coeficiente numérico expressa a mudança prevista para um desvio-padrão da entrada, mantendo as demais fixas.
+7. Dentro dos 80% de desenvolvimento, reservar 25% para validação interna, também com semente 42 e estratificação. Isso deixa 60% da base limpa para ajuste, 20% para validação e 20% para teste final.
+8. Codificar `wine_type` e padronizar as medidas em um `Pipeline`. As transformações devem ser aprendidas somente nos dados de ajuste.
+9. Ajustar uma `LinearRegression`, gerar previsões na validação e interpretar o MAE em pontos de nota.
+10. Examinar os coeficientes e discutir três variáveis em que o modelo se apoia. Em variáveis padronizadas, o coeficiente numérico expressa a mudança prevista para um desvio-padrão da entrada, mantendo as demais fixas. Conferir uma previsão pela soma das contribuições e do intercepto.
 
 **Entrega do passo:** limpeza justificada, divisão documentada e primeira regressão funcionando.
 
 Guarde o teste final. Ele será utilizado no passo 5, após escolher o modelo no treino.
+
+O notebook do passo 2 já inclui tabelas, gráficos, respostas do grupo e checklist. Ele mantém os CSVs originais e apresenta os resultados em suas próprias saídas. Nas etapas seguintes, reproduza a mesma limpeza e divisão inicial para manter o teste reservado; a validação cruzada será aplicada somente aos dados de desenvolvimento.
 
 ## Passo 3 — Criar uma referência e escolher como medir o erro
 
