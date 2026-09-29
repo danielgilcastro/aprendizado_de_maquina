@@ -10,13 +10,12 @@ Esta versão foi revisada em **29/09/2026**. A ordem dos arquivos mostra que os 
 
 | Conteúdo | Data do arquivo | Adaptação aplicada |
 | --- | --- | --- |
-| `passo_1_qualidade_vinhos.ipynb` | criado em 22/09; modificado em 23/09 | respostas preenchidas e execução completa |
-| `passo_2_qualidade_vinhos.ipynb` | criado em 23/09; modificado em 24/09 | respostas preenchidas, instalação interna removida e execução completa |
+| notebooks intermediários dos passos 1 e 2 | criados entre 22 e 23/09 | revisados e depois consolidados no notebook final; as cópias intermediárias foram removidas da entrega |
 | materiais da Aula 4 | 24–25/09 | curva de complexidade com treino e validação cruzada; diagnóstico de sobreajuste |
 | `aula5/note.ipynb` e `aula5/1_aula5.pdf` | 29/09 | validação cruzada, floresta aleatória, comparação antes do teste e auditoria de vazamento |
 | `Banco_de_Perguntas.pdf` | 29/09; metadados internos de 28/09 | respostas para as 13 perguntas e preparação para apresentação em 05/10, das 9h às 11h |
 
-O arquivo principal agora é [projeto_qualidade_vinhos_completo.ipynb](projeto_qualidade_vinhos_completo.ipynb). Ele contém todos os passos, salva resultados reproduzíveis em `resultados/` e deve ser a fonte dos números do relatório e da apresentação.
+O arquivo principal agora é [projeto_qualidade_vinhos_completo.ipynb](projeto_qualidade_vinhos_completo.ipynb). Ele substitui os dois notebooks intermediários, contém todos os passos, salva resultados reproduzíveis em `resultados/` e deve ser a fonte dos números do relatório e da apresentação.
 
 ### Entregas preparadas
 
@@ -30,17 +29,9 @@ O arquivo principal agora é [projeto_qualidade_vinhos_completo.ipynb](projeto_q
 
 1. Abra a pasta do repositório no VS Code ou no Jupyter.
 2. Selecione o ambiente Python `.venv` do projeto. Se estiver em outro computador, instale as dependências da raiz com `pip install -r requirements.txt`.
-3. Para acompanhar a construção, abra [passo_1_qualidade_vinhos.ipynb](passo_1_qualidade_vinhos.ipynb) e depois [passo_2_qualidade_vinhos.ipynb](passo_2_qualidade_vinhos.ipynb). Para revisar ou entregar o projeto, abra [projeto_qualidade_vinhos_completo.ipynb](projeto_qualidade_vinhos_completo.ipynb).
+3. Abra [projeto_qualidade_vinhos_completo.ipynb](projeto_qualidade_vinhos_completo.ipynb), que reúne a construção, a revisão e a entrega final.
 4. Execute as células de cima para baixo com `Shift + Enter`.
 5. Leia as saídas e confira as respostas já preenchidas. Altere apenas se o grupo tomar uma decisão diferente e, nesse caso, reexecute o notebook completo e atualize relatório e apresentação.
-
-Depois de concluir a auditoria, continue em [passo_2_qualidade_vinhos.ipynb](passo_2_qualidade_vinhos.ipynb). Ele usa os CSVs locais e pode ser executado com um kernel novo, sem depender das variáveis do primeiro notebook.
-
-No Windows, a partir da raiz do repositório:
-
-```powershell
-.\.venv\Scripts\python.exe -m notebook projeto/passo_1_qualidade_vinhos.ipynb
-```
 
 Para reexecutar a entrega final sem abrir a interface:
 
@@ -52,7 +43,7 @@ Na primeira execução, o notebook baixa os dois CSVs públicos indicados no enu
 
 ## Passo 1 — Definir o problema e conhecer os dados
 
-**Arquivo desta etapa:** [passo_1_qualidade_vinhos.ipynb](passo_1_qualidade_vinhos.ipynb).
+**Arquivo desta etapa:** seção correspondente de [projeto_qualidade_vinhos_completo.ipynb](projeto_qualidade_vinhos_completo.ipynb).
 
 **Ajuda a escrever:** seções 1 e 2 do relatório.
 
@@ -85,7 +76,7 @@ Neste primeiro passo, os dados originais são mantidos: a limpeza e o treinament
 
 ## Passo 2 — Preparar os dados e ajustar a primeira regressão
 
-**Arquivo desta etapa:** [passo_2_qualidade_vinhos.ipynb](passo_2_qualidade_vinhos.ipynb).
+**Arquivo desta etapa:** seção correspondente de [projeto_qualidade_vinhos_completo.ipynb](projeto_qualidade_vinhos_completo.ipynb).
 
 **Ajuda a escrever:** seções 1 e 2; primeiro resultado para a seção 3.
 
@@ -106,7 +97,7 @@ Neste primeiro passo, os dados originais são mantidos: a limpeza e o treinament
 
 Guarde o teste final. Ele será utilizado no passo 5, após escolher o modelo no treino.
 
-O notebook do passo 2 já inclui tabelas, gráficos, respostas do grupo e checklist. Ele mantém os CSVs originais e apresenta os resultados em suas próprias saídas. Nas etapas seguintes, reproduza a mesma limpeza e divisão inicial para manter o teste reservado; a validação cruzada será aplicada somente aos dados de desenvolvimento.
+O notebook completo inclui tabelas, gráficos, respostas do grupo e checklist. Ele mantém os CSVs originais e apresenta os resultados em suas próprias saídas. Nas etapas seguintes, reproduz a mesma limpeza e divisão inicial para manter o teste reservado; a validação cruzada é aplicada somente aos dados de desenvolvimento.
 
 ## Passo 3 — Criar uma referência e escolher como medir o erro
 

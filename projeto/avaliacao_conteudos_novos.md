@@ -8,8 +8,7 @@ Revisão realizada em 29/09/2026 com base nas datas do sistema de arquivos, nos 
 | --- | --- | --- | --- | --- |
 | `Projeto_disciplina.pdf` | 22/09/2026 10:44 | 22/09/2026 10:44 | enunciado original | define notebook, relatório de até 5 páginas e seis seções |
 | `Projeto_disciplina_gabarito_qualidade_vinhos.pdf` | 22/09/2026 14:27 | 22/09/2026 14:27 | criado em 22/09 | fornece uma resposta modelo e parâmetros de referência |
-| `passo_1_qualidade_vinhos.ipynb` | 22/09/2026 15:02 | 23/09/2026 09:29 | anterior às Aulas 4 e 5 | respostas foram preenchidas e todas as células reexecutadas |
-| `passo_2_qualidade_vinhos.ipynb` | 23/09/2026 09:27 | 24/09/2026 09:50 | anterior à Aula 5 | respostas foram preenchidas; a instalação dentro do notebook foi removida; todas as células foram reexecutadas |
+| notebooks intermediários dos passos 1 e 2 | 22–23/09/2026 | 23–24/09/2026 | anteriores às Aulas 4 e 5 | foram revisados e depois consolidados; as cópias intermediárias não integram mais a entrega final |
 | materiais da Aula 4 | 24–25/09/2026 | 24–25/09/2026 | árvores, sobreajuste e subajuste | acrescentamos curva de MAE de treino e validação para profundidades de 1 a 18 |
 | `Banco_de_Perguntas.pdf` | 29/09/2026 12:38 | 29/09/2026 12:38 | PDF criado internamente em 28/09/2026 21:41 | acrescentamos respostas para 13 perguntas e confirmamos apresentação em 05/10, das 9h às 11h |
 | `aula5/note.ipynb` | 29/09/2026 09:18 | 29/09/2026 12:29 | conteúdo da Aula 5 | acrescentamos validação cruzada, floresta, comparação sem teste e caça a vazamento |
@@ -32,8 +31,8 @@ Os passos 1 e 2 tinham uma base metodológica correta: alvo separado, duplicatas
 
 ## Adaptações concluídas
 
-1. Os notebooks dos passos 1 e 2 foram preenchidos e executados sem erros.
-2. `projeto_qualidade_vinhos_completo.ipynb` passou a reunir o fluxo de ponta a ponta.
+1. Os notebooks intermediários dos passos 1 e 2 foram revisados e seu conteúdo foi consolidado.
+2. `projeto_qualidade_vinhos_completo.ipynb` passou a reunir o fluxo de ponta a ponta e substituiu as cópias intermediárias na entrega.
 3. A base original de 6.497 linhas foi reduzida a 5.320 após a remoção declarada de 1.177 duplicatas completas.
 4. O teste final preserva 1.064 linhas. As 4.256 restantes formam o desenvolvimento.
 5. Todos os modelos usam as mesmas cinco dobras de `KFold` com embaralhamento e `random_state=42`.
@@ -47,7 +46,7 @@ Os passos 1 e 2 tinham uma base metodológica correta: alvo separado, duplicatas
 
 ## Verificações
 
-- Os três notebooks foram executados do início ao fim e não contêm saídas de erro.
+- O notebook final foi executado do início ao fim e não contém saídas de erro.
 - Os resultados numéricos foram salvos em `resultados/` para uso no relatório e na apresentação.
 - O teste final só aparece depois de o notebook registrar o modelo e o corte escolhidos.
 - `quality` não aparece nas entradas; duplicatas saem antes da divisão; preparação e ajuste acontecem dentro de cada dobra.
