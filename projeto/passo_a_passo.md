@@ -4,13 +4,35 @@ Este roteiro segue as seis seções do enunciado `Projeto_disciplina.pdf`. A pro
 
 **Escolha adotada:** regressão, para prever a nota `quality`. O modelo recebe medições físico-químicas e o tipo do vinho e devolve um número, como 6,3. Essa escolha é consistente com o gabarito preparado para o grupo.
 
+## Atualização com os conteúdos novos
+
+Esta versão foi revisada em **29/09/2026**. A ordem dos arquivos mostra que os notebooks iniciais foram produzidos antes das Aulas 4 e 5 e antes do banco de perguntas:
+
+| Conteúdo | Data do arquivo | Adaptação aplicada |
+| --- | --- | --- |
+| `passo_1_qualidade_vinhos.ipynb` | criado em 22/09; modificado em 23/09 | respostas preenchidas e execução completa |
+| `passo_2_qualidade_vinhos.ipynb` | criado em 23/09; modificado em 24/09 | respostas preenchidas, instalação interna removida e execução completa |
+| materiais da Aula 4 | 24–25/09 | curva de complexidade com treino e validação cruzada; diagnóstico de sobreajuste |
+| `aula5/note.ipynb` e `aula5/1_aula5.pdf` | 29/09 | validação cruzada, floresta aleatória, comparação antes do teste e auditoria de vazamento |
+| `Banco_de_Perguntas.pdf` | 29/09; metadados internos de 28/09 | respostas para as 13 perguntas e preparação para apresentação em 05/10, das 9h às 11h |
+
+O arquivo principal agora é [projeto_qualidade_vinhos_completo.ipynb](projeto_qualidade_vinhos_completo.ipynb). Ele contém todos os passos, salva resultados reproduzíveis em `resultados/` e deve ser a fonte dos números do relatório e da apresentação.
+
+### Entregas preparadas
+
+- `projeto_qualidade_vinhos_completo.ipynb`: notebook final, executado do início ao fim.
+- `relatorio_qualidade_vinhos.docx` e `relatorio_qualidade_vinhos.pdf`: relatório final de até 5 páginas.
+- `apresentacao_qualidade_vinhos.pptx`: apresentação de aproximadamente 5 minutos.
+- `respostas_banca.md`: respostas curtas e evidências para as 13 perguntas.
+- `avaliacao_conteudos_novos.md`: registro das datas, mudanças e verificações.
+
 ## Como começar
 
 1. Abra a pasta do repositório no VS Code ou no Jupyter.
 2. Selecione o ambiente Python `.venv` do projeto. Se estiver em outro computador, instale as dependências da raiz com `pip install -r requirements.txt`.
-3. Abra [passo_1_qualidade_vinhos.ipynb](passo_1_qualidade_vinhos.ipynb).
+3. Para acompanhar a construção, abra [passo_1_qualidade_vinhos.ipynb](passo_1_qualidade_vinhos.ipynb) e depois [passo_2_qualidade_vinhos.ipynb](passo_2_qualidade_vinhos.ipynb). Para revisar ou entregar o projeto, abra [projeto_qualidade_vinhos_completo.ipynb](projeto_qualidade_vinhos_completo.ipynb).
 4. Execute as células de cima para baixo com `Shift + Enter`.
-5. Leia as saídas, responda às perguntas finais nas células de texto e salve o notebook.
+5. Leia as saídas e confira as respostas já preenchidas. Altere apenas se o grupo tomar uma decisão diferente e, nesse caso, reexecute o notebook completo e atualize relatório e apresentação.
 
 Depois de concluir a auditoria, continue em [passo_2_qualidade_vinhos.ipynb](passo_2_qualidade_vinhos.ipynb). Ele usa os CSVs locais e pode ser executado com um kernel novo, sem depender das variáveis do primeiro notebook.
 
@@ -18,6 +40,12 @@ No Windows, a partir da raiz do repositório:
 
 ```powershell
 .\.venv\Scripts\python.exe -m notebook projeto/passo_1_qualidade_vinhos.ipynb
+```
+
+Para reexecutar a entrega final sem abrir a interface:
+
+```powershell
+.\.venv\Scripts\jupyter-nbconvert.exe --to notebook --execute --inplace --ExecutePreprocessor.timeout=1200 projeto/projeto_qualidade_vinhos_completo.ipynb
 ```
 
 Na primeira execução, o notebook baixa os dois CSVs públicos indicados no enunciado e guarda cópias em `projeto/dados/`. As execuções seguintes usam essas cópias e funcionam sem internet. O notebook pode ser executado com a pasta de trabalho na raiz do repositório ou em `projeto/`.
@@ -94,6 +122,8 @@ O notebook do passo 2 já inclui tabelas, gráficos, respostas do grupo e checkl
 
 **Exemplo de leitura:** se as notas reais forem 5, 6 e 7 e as previsões forem 5,5; 5,5; 6,0, os erros absolutos são 0,5; 0,5; 1,0. O MAE é aproximadamente 0,67 ponto.
 
+**Resultado executado:** a referência teve MAE de teste 0,643 e a regressão linear 0,566. A regressão reduz o erro, mas a comparação final ainda inclui k-NN, árvore e floresta.
+
 **Entrega do passo:** tabela comparativa e um parágrafo explicando se a regressão melhora a referência.
 
 O MAE não é porcentagem de acertos e não é o erro máximo de uma previsão individual.
@@ -109,6 +139,8 @@ O MAE não é porcentagem de acertos e não é o erro máximo de uma previsão i
 3. Construir o gráfico com profundidade no eixo horizontal e MAE no vertical.
 4. Interpretar: erro alto nos dois conjuntos sugere subajuste; treino melhora enquanto validação piora sugere sobreajuste.
 5. Escolher profundidade e demais parâmetros pela validação do treino.
+
+Na execução de 29/09, a profundidade 5 apresentou o menor MAE médio entre as profundidades testadas com `KFold` embaralhado e `random_state=42`. A partir daí, o MAE de treino continuou caindo enquanto o MAE de validação subiu.
 
 **Entrega do passo:** gráfico e justificativa da complexidade escolhida.
 
@@ -130,6 +162,8 @@ O enunciado fala em curva “treino × teste”. Para escolher a profundidade, u
 8. Analisar erros por nota e por tipo de vinho, sempre informando o número de casos de cada grupo.
 9. Se investigar importância de variáveis, explicar que associação preditiva não demonstra causa.
 
+**Resultado executado:** a floresta aleatória com 350 árvores e `max_features=0.7` foi escolhida antes do teste. No teste final, obteve MAE 0,529, RMSE 0,684 e R² 0,396. A referência teve MAE 0,643; a redução relativa do MAE foi 17,7%. O teste não foi usado para rever a escolha.
+
 **Entrega do passo:** modelo escolhido, comparação com referência e análise das falhas.
 
 Se o teste motivar novas escolhas de modelo ou corte, ele deixa de ser uma avaliação final independente. Será necessário outro conjunto reservado para confirmar essas mudanças.
@@ -148,6 +182,8 @@ Se o teste motivar novas escolhas de modelo ou corte, ele deixa de ser uma avali
 4. Medir precisão e sensibilidade para essa regra de triagem. O modelo continua sendo um regressor; a decisão derivada é binária.
 5. Explicar limitações: notas raras, região de origem, informações ausentes e subjetividade da avaliação.
 6. Definir restrições: não substituir avaliação humana, não inferir segurança sanitária ou preço e não aplicar a outros contextos sem validação.
+
+**Resultado executado:** o maior corte em décimos que preservou pelo menos 75% de sensibilidade nas previsões fora da dobra foi 6,0. No teste, ele selecionou 369 de 1.064 amostras, recuperou 165 de 202 vinhos com nota real 7 ou maior, teve sensibilidade de 81,7% e precisão de 44,7%.
 
 **Entrega do passo:** decisão descrita, corte justificado e lista objetiva de limitações e restrições.
 
@@ -173,10 +209,10 @@ Para o grupo de quatro pessoas:
 1. Registrar os responsáveis por cada seção, conforme pedido no enunciado.
 2. Reexecutar o notebook completo do início ao fim, sem depender de variáveis criadas fora da sequência.
 3. Conferir se os números do relatório correspondem às saídas salvas.
-4. Preparar cerca de 5 minutos de apresentação e 10 minutos para perguntas, conforme o enunciado.
+4. Preparar cerca de 5 minutos de apresentação e 10 minutos para perguntas. O banco mais novo informa **05/10, das 9h às 11h**, com cerca de 15 minutos por grupo.
 5. Ensaiar a explicação do alvo, do MAE, da referência, do vazamento, do sobreajuste e do corte.
 
-**Entrega final:** notebook com importação, preparação, treinamento e previsões; relatório de até 5 páginas; integrantes preparados para explicar as seções pelas quais respondem.
+**Entrega final:** notebook com importação, preparação, treinamento e previsões; relatório de até 5 páginas; apresentação curta; respostas para a banca; integrantes preparados para explicar as seções pelas quais respondem.
 
 O enunciado indica entrega em 02/10 e apresentação em 05/10, ambas sujeitas a confirmação do professor.
 
