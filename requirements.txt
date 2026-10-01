@@ -1,4 +1,5 @@
 jupyter
+ipywidgets
 matplotlib
 numpy
 pandas

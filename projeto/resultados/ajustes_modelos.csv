@@ -1,0 +1,8 @@
+família,configuração,MAE VC,parametro
+k-NN,"k=5, pesos=distância",0.5601083416320853,5
+k-NN,"k=10, pesos=distância",0.5518062304082657,10
+k-NN,"k=15, pesos=distância",0.5497382326607738,15
+k-NN,"k=25, pesos=distância",0.55128007098264,25
+k-NN,"k=35, pesos=distância",0.5533219957593617,35
+Floresta,"100 árvores, max_features=0.7",0.5331326966893409,100
+Floresta,"350 árvores, max_features=0.7",0.530871017724049,350

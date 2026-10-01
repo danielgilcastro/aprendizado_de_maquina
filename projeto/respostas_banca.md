@@ -82,15 +82,14 @@ Testamos referência pela mediana, regressão linear, k-NN, árvore e floresta. 
 
 **Onde mostrar:** comparação antes do teste, frase “Escolha congelada antes do teste” e tabela final.
 
-## Divisão sugerida das seis seções
-
-Substituam os identificadores pelos nomes reais do grupo antes da entrega.
+## Responsáveis pelas seis seções
 
 | Responsável | Seções |
 | --- | --- |
-| Integrante 1 | 1 Objetivo da modelagem e 6 Restrições de uso |
-| Integrante 2 | 2 Dados utilizados |
-| Integrante 3 | 3 Desempenho e comparação e 5 Limitações |
-| Integrante 4 | 4 Uso pretendido |
+| Daniel Gil | 1 Objetivo da modelagem e 6 Restrições de uso |
+| Bruno Pimentel | 2 Dados utilizados |
+| Bruno Groppo | 3 Desempenho e comparação |
+| Wallace Jardim | 4 Uso pretendido |
+| Reynato Junior | 5 Limitações |
 
 Todos devem entender o projeto completo, pois o banco permite perguntas de continuação como “por quê?”, “e se?” e “mostre no notebook”.
