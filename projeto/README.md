@@ -1,6 +1,6 @@
 # Projeto: qualidade de vinhos
 
-O notebook estima a nota sensorial de amostras de vinho e avalia uma regra de prioridade para degustação humana. Os dados públicos estão na pasta dados.
+O notebook usa a previsão da nota sensorial para estudar o fluxo de aprendizado de máquina. A regra de corte é uma simulação didática. Os dados públicos estão na pasta dados.
 
 ## Executar
 
@@ -18,6 +18,6 @@ Também é possível executar o notebook a partir da pasta projeto. O teste fina
 ## Entregáveis
 
 - projeto_qualidade_vinhos_completo.ipynb: código, gráficos e resultados executados.
-- relatorio_qualidade_vinhos.pdf: relatório em quatro páginas, com as seis seções do enunciado.
+- relatorio_qualidade_vinhos.pdf: relatório em cinco páginas, com as seis seções do enunciado.
 - respostas_banca.md: apoio para a apresentação e a divisão das seções.
 - gerar_relatorio.py: reprodução do PDF a partir dos resultados do notebook.

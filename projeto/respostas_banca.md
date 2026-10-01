@@ -16,7 +16,7 @@ O modelo devolve um número, a nota estimada `quality`, por exemplo 6,3. Isso co
 
 ## 3 Decisão alimentada pela saída
 
-A previsão ordena amostras para uma segunda degustação humana. A regra envia primeiro as amostras com nota prevista de pelo menos 6,0. O sistema não aprova nem rejeita o vinho; o painel humano toma a decisão final.
+A finalidade do projeto é estudar as etapas do aprendizado de máquina com uma tarefa real de regressão. O corte de 6,0 simula a identificação de vinhos com nota 7 ou maior para discutir precisão e sensibilidade; não é uma regra de uso comercial.
 
 **Onde mostrar:** curva de corte e métricas operacionais.
 
@@ -28,7 +28,7 @@ O MAE é a métrica principal porque mede a distância média em pontos de nota.
 
 ## 5 Erro relevante e quem é prejudicado
 
-Para a triagem, o erro mais preocupante é o falso negativo: um vinho realmente 7 ou maior que não segue para degustação prioritária. No teste, a regra recuperou 165 dos 202 vinhos de interesse e deixou 37 de fora. Falsos positivos consomem capacidade do painel, mas não encerram a avaliação de um vinho.
+Na simulação do corte, um falso negativo é um vinho realmente 7+ abaixo do limite. No teste, a regra identificou 165 dos 202 casos 7+ e deixou 37 abaixo do corte. Os 204 falsos positivos ficaram acima do corte sem ter nota real 7+. Esses erros mostram por que a regra não pode ser usada como decisão automática.
 
 O erro numérico também cresce nos extremos. O MAE foi 2,369 para nota 3, 1,211 para nota 4, 1,521 para nota 8 e 3,371 para a única amostra de nota 9. Esses grupos pequenos exigem cautela.
 
@@ -72,7 +72,7 @@ O resultado mudaria. Nas cinco dobras, o MAE da floresta variou de 0,521 a 0,547
 
 ## 12 Onde o modelo não deve ser usado
 
-O modelo não deve substituir degustadores, aprovar ou rejeitar lotes automaticamente, certificar segurança sanitária, estimar preço ou orientar alterações químicas como se a importância fosse causal. Também não deve ser aplicado a outras regiões, variedades, safras, períodos ou laboratórios sem validação externa.
+O modelo não deve decidir qualidade comercial, aprovar ou rejeitar lotes, certificar segurança sanitária, estimar preço ou orientar alterações químicas como se a importância fosse causal. Também não deve ser aplicado a outras regiões, variedades, safras, períodos ou laboratórios sem validação externa.
 
 **Onde mostrar:** seção de limitações e restrições.
 
@@ -81,6 +81,14 @@ O modelo não deve substituir degustadores, aprovar ou rejeitar lotes automatica
 Testamos referência pela mediana, regressão linear, k-NN, árvore e floresta. Todos usaram as mesmas cinco dobras e o mesmo MAE. A floresta apresentou o menor MAE médio de validação e foi registrada como escolhida antes da célula de teste. O teste apareceu uma vez depois do congelamento do modelo e do corte.
 
 **Onde mostrar:** comparação antes do teste, frase “Escolha congelada antes do teste” e tabela final.
+
+## 14 Proxy e diferenças entre grupos (Aula 7)
+
+As 11 medidas químicas preveem o tipo do vinho com AUC média de 0,996 nas cinco dobras do desenvolvimento. Portanto, retirar wine_type não elimina essa informação. A floresta teve MAE médio de 0,531 com a coluna e 0,531 sem ela: a diferença foi inferior a 0,001 ponto de nota. Isso não justifica descartar automaticamente a variável.
+
+No teste, o MAE foi 0,453 em tintos (n=267) e 0,554 em brancos (n=797). A diferença exige cautela e nova validação; ela não comprova discriminação. Wine_type não é um atributo pessoal sensível, e a base não contém dados demográficos.
+
+**Onde mostrar:** auditoria de variáveis e proxies no notebook e página 5 do relatório.
 
 ## Responsáveis pelas seis seções
 
