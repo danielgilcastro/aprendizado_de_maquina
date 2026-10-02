@@ -392,7 +392,7 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
     pdf.savefig(fig)
     plt.close(fig)
 
-    # Página 5 — teste de proxy, restrições e fontes.
+    # Página 5 — teste de proxy, restrições e resumo.
     fig = pagina(5, "Proxies e restrições", "Aula 7 aplicada ao conjunto de vinhos")
     fig.text(0.08, 0.849, "O tipo continua nas outras medidas?", size=10.5, color=NAVY, weight="bold")
     paragrafo(
@@ -427,25 +427,17 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
         "O modelo serve para estudo. Não deve aprovar lotes, definir preço ou indicar segurança e mudanças químicas. Faltam safra, produtor, variedade e armazenamento. Antes de usar em outro contexto, seria preciso testar novos dados e acompanhar os erros por grupo.",
         largura=108, tamanho=8.2,
     )
-    fig.text(0.08, 0.292, "Reprodução e responsáveis", size=9.4, color=NAVY, weight="bold")
-    paragrafo(
-        fig, 0.08, 0.270,
-        "Os CSVs locais, a semente 42 e as mesmas dobras permitem reproduzir a análise. O alvo fica fora das entradas; duplicatas saem antes da divisão; preparo, modelo e corte são fixados sem consultar o teste.",
-        largura=110, tamanho=7.8,
-    )
-    fig.text(
-        0.08, 0.203,
-        "Seções: Daniel Gil (1 e 6); Bruno Pimentel (2); Bruno Groppo (3);",
-        size=7.7, color=INK,
-    )
-    fig.text(0.08, 0.187, "Wallace Jardim (4); Reynato Junior (5).", size=7.7, color=INK)
-    fig.text(0.08, 0.151, "Fontes", size=8.7, color=NAVY, weight="bold")
-    fig.text(
-        0.08, 0.132,
-        "Cortez et al. (2009), Modeling wine preferences by data mining from physicochemical properties.\n"
-        "IASEG, Projeto da Disciplina 2 e Aula 7 (2026). URLs dos CSVs na página 1.",
-        size=7.3, color=MUTED, va="top", linespacing=1.35,
-    )
+    fig.text(0.08, 0.292, "Resumo do projeto: o que fizemos e por quê", size=10, color=NAVY, weight="bold")
+    resumo_direto = [
+        (0.263, "Pergunta", "Estimamos a nota quality. Usamos regressão porque a resposta é um número."),
+        (0.227, "Dados", "Tiramos 1.177 duplicatas para evitar cópias em treino e teste; ficaram 5.320 linhas."),
+        (0.191, "Modelo", f"Floresta com 350 árvores: menor MAE na validação ({resumo['MAE_floresta_com_tipo']:.3f}). Com 100, foi {mae_100_arvores:.3f}."),
+        (0.155, "Resultado", f"MAE {resumo['mae_teste_modelo']:.3f} no teste, contra {resumo['mae_teste_referencia']:.3f} da mediana: {100 * resumo['reducao_mae_referencia']:.1f}% menos erro."),
+        (0.119, "Limite", "O corte 6,0 só simula uma triagem. Faltam dados e o modelo erra mais nas notas extremas."),
+    ]
+    for y, rotulo, texto in resumo_direto:
+        fig.text(0.08, y, rotulo, size=8.2, color=TEAL, weight="bold", va="top")
+        paragrafo(fig, 0.20, y, texto, largura=88, tamanho=8.0, altura=1.3)
     pdf.savefig(fig)
     plt.close(fig)
 

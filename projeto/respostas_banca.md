@@ -1,103 +1,89 @@
-# Respostas para o banco de perguntas
+# Respostas para a banca - Qualidade de vinhos
 
-Estas respostas usam a execução salva em `projeto_qualidade_vinhos_completo.ipynb`. Cada integrante deve saber localizar as tabelas e explicar as decisões, mesmo quando outra pessoa assinar a seção correspondente.
+Este guia segue as 13 perguntas oficiais do `Banco_de_Perguntas.pdf`. Os números vêm da execução de 02/10/2026 do `projeto_qualidade_vinhos_completo.ipynb`. A resposta deve ser explicada com palavras próprias; a indicação ao fim de cada item ajuda a mostrar a evidência no notebook.
 
-## 1 Modelo de referência e ganho
+**Números para lembrar:** 6.497 linhas originais; 5.320 após retirar duplicatas; 4.256 no desenvolvimento; 1.064 no teste. Modelo escolhido: floresta aleatória com 350 árvores. MAE médio na validação: 0,531; MAE no teste: 0,529; referência no teste: 0,643. O corte 6,0 é apenas uma simulação de triagem.
 
-O modelo de referência é um `DummyRegressor` que prevê sempre a mediana do conjunto de desenvolvimento. No teste, seu MAE foi 0,643. A floresta teve MAE 0,529: errou 0,114 ponto a menos, uma redução de 17,7%.
+## 1. Qual é o modelo de referência e quanto o nosso modelo melhora?
 
-**Onde mostrar:** tabela final de comparação no notebook.
+**Resposta:** A referência prevê sempre a mediana das notas do treino. No teste, seu MAE foi 0,643. A floresta teve MAE 0,529: errou 0,114 ponto de nota a menos, uma redução de 17,7%.
 
-## 2 Tipo de saída e relação com a pergunta
+**No notebook:** seções 3 (referência e métrica) e 5 (avaliação final no teste).
 
-O modelo devolve um número, a nota estimada `quality`, por exemplo 6,3. Isso corresponde à pergunta “qual nota esta amostra deve receber?” e caracteriza regressão. A previsão contínua preserva a ordem e a distância aproximada entre as notas.
+## 2. O que o modelo devolve e como isso responde à pergunta?
 
-**Onde mostrar:** abertura do notebook e função `prever_amostra`.
+**Resposta:** Ele devolve um número, a nota estimada do vinho, como 6,3. Nossa pergunta é qual nota sensorial podemos estimar a partir das medidas químicas e do tipo. Como a resposta é numérica, a tarefa é regressão.
 
-## 3 Decisão alimentada pela saída
+**No notebook:** abertura, definição de `quality` como alvo e função `prever_amostra`.
 
-A finalidade do projeto é estudar as etapas do aprendizado de máquina com uma tarefa real de regressão. O corte de 6,0 simula a identificação de vinhos com nota 7 ou maior para discutir precisão e sensibilidade; não é uma regra de uso comercial.
+## 3. Que decisão a saída alimenta? Como passamos do número à ação?
 
-**Onde mostrar:** curva de corte e métricas operacionais.
+**Resposta:** No exercício, simulamos uma fila de revisão de vinhos com nota real 7 ou mais. Escolhemos o corte 6,0 nas previsões: notas previstas de 6,0 ou mais entram na fila. Esse foi o maior corte que manteve sensibilidade de pelo menos 75% nos dados de desenvolvimento. Não é uma regra comercial.
 
-## 4 Motivo da métrica
+**No notebook:** seção 5, curva de corte e métricas da triagem no teste.
 
-O MAE é a métrica principal porque mede a distância média em pontos de nota. Ele é fácil de explicar e não transforma regressão em porcentagem de acertos. O RMSE aparece como complemento porque dá mais peso a erros grandes.
+## 4. Por que usamos essa métrica?
 
-**Onde mostrar:** tabela de validação e tabela de teste.
+**Resposta:** Usamos MAE porque ele mostra, em média, quantos pontos de nota a previsão erra. É fácil comparar com a referência: menor MAE significa menor erro. Acurácia não mede a distância entre notas; RMSE aparece só como complemento para destacar erros grandes.
 
-## 5 Erro relevante e quem é prejudicado
+**No notebook:** seção 3 e tabelas de validação e teste.
 
-Na simulação do corte, um falso negativo é um vinho realmente 7+ abaixo do limite. No teste, a regra identificou 165 dos 202 casos 7+ e deixou 37 abaixo do corte. Os 204 falsos positivos ficaram acima do corte sem ter nota real 7+. Esses erros mostram por que a regra não pode ser usada como decisão automática.
+## 5. Qual erro seria o pior e para quem?
 
-O erro numérico também cresce nos extremos. O MAE foi 2,369 para nota 3, 1,211 para nota 4, 1,521 para nota 8 e 3,371 para a única amostra de nota 9. Esses grupos pequenos exigem cautela.
+**Resposta:** Na triagem simulada, priorizamos não deixar um vinho realmente 7+ de fora. Isso aconteceu com 37 dos 202 vinhos 7+ do teste; quem faria a revisão perderia essas amostras. Também houve 204 falsos positivos, que aumentariam o trabalho. Como o uso é didático, não há uma decisão comercial real sendo tomada.
 
-**Onde mostrar:** tabela de triagem e gráfico de erros por nota.
+**No notebook:** curva de corte, métricas da triagem e erros por nota.
 
-## 6 Variáveis mais usadas
+## 6. Quais variáveis o modelo mais usou? Era esperado?
 
-Na importância por permutação, embaralhar `alcohol` aumentou o MAE em 0,137, o maior efeito. Depois vieram `volatile acidity` com 0,057 e `free sulfur dioxide` com 0,038. Isso combina com a expectativa de que composição química se associe à avaliação, mas não demonstra que alterar uma variável causará mudança na nota.
+**Resposta:** Pelo teste de importância por permutação, as três primeiras foram `alcohol` (aumento de 0,137 no MAE ao embaralhar), `volatile acidity` (0,057) e `free sulfur dioxide` (0,038). Esperávamos que medidas químicas ajudassem a estimar a nota. Essa análise mostra associação com a previsão; não prova que mudar uma medida mudará a nota.
 
-**Onde mostrar:** tabela e gráfico de importância por permutação.
+**No notebook:** seção 6, tabela e gráfico de importância por permutação.
 
-## 7 Evidência de generalização
+## 7. Como sabemos que o modelo aprendeu e não apenas decorou o treino?
 
-A floresta teve MAE médio de 0,531 nas cinco dobras, variando de 0,521 a 0,547. O teste, mantido fora das escolhas, teve MAE 0,529 e ficou dentro dessa faixa. A curva da árvore também mostra que profundidades maiores reduzem o erro de treino enquanto aumentam o de validação depois de cerca de 5, sinal de sobreajuste.
+**Resposta:** O MAE da floresta no treino foi 0,195, menor que na validação (0,531); isso mostra algum sobreajuste. Mesmo assim, o MAE no teste separado foi 0,529, próximo da validação e melhor que a referência (0,643). É evidência de que a floresta aprendeu padrões úteis, sem prometer o mesmo resultado em qualquer base nova.
 
-**Onde mostrar:** tabela de validação, curva da árvore e tabela de teste.
+**No notebook:** seção 5, comparação entre treino, cinco dobras e teste; seção 4, curva da árvore.
 
-## 8 Variáveis ou linhas descartadas
+## 8. Descartamos alguma variável na auditoria? Por quê?
 
-Nenhuma coluna preditora foi descartada. Removemos 1.177 duplicatas completas e mantivemos 5.320 linhas. A decisão reduz o risco de cópias idênticas em treino e teste. Como não há identificador de amostra, não podemos afirmar que toda repetição era erro; essa é uma limitação declarada.
+**Resposta:** Não descartamos colunas de entrada. Removemos 1.177 linhas totalmente repetidas antes da divisão, para evitar cópias em treino e teste. Ficaram 5.320 linhas. Mantivemos `wine_type`: sua importância isolada foi pequena, mas outras medidas podem carregar a mesma informação sobre o tipo. Sem identificador, algumas linhas repetidas podem ser vinhos diferentes; essa é uma limitação.
 
-**Onde mostrar:** auditoria e divisão dos dados.
+**No notebook:** seções 1 e 2 (auditoria e limpeza) e 7 (teste de `wine_type`).
 
-## 9 Informação conhecida apenas depois do evento
+## 9. Há informação conhecida só depois da avaliação? E se ela entrasse?
 
-A nota `quality` só existe depois da avaliação sensorial e fica exclusivamente em `y`. Ela não entra em `X`. As 11 medidas e o tipo do vinho estão disponíveis antes da triagem. Também evitamos vazamento de preparação: codificação e escala aprendem somente na parte de treino de cada dobra.
+**Resposta:** Sim: `quality` é a nota dada depois da avaliação sensorial. Ela é o alvo (`y`) e não entra nas entradas (`X`). Se entrasse, o modelo veria a resposta durante o treino e os resultados pareceriam bons por vazamento. Escala e codificação também são ajustadas só com o treino de cada dobra.
 
-**Onde mostrar:** definição de `X`, `y` e do pipeline.
+**No notebook:** seção 2, criação de `X` e `y`; seção 3, pipeline de preparação.
 
-## 10 Perda ao trocar um modelo simples por um complexo
+## 10. O que perdemos ao escolher um modelo mais complexo?
 
-A floresta reduziu o MAE, mas perdeu legibilidade. A regressão linear pode ser descrita por coeficientes e a árvore rasa por caminhos. A floresta combina centenas de árvores, custa mais para treinar e exige técnicas posteriores, como importância por permutação, para resumir dependências. Essa importância continua sem provar causalidade.
+**Resposta:** A floresta foi mais precisa na validação que a regressão linear (MAE 0,531 contra 0,565), mas é mais difícil de explicar e custa mais para treinar. Uma regressão linear tem coeficientes; uma árvore rasa tem caminhos. A floresta combina 350 árvores, então usamos a importância por permutação para resumir quais entradas ajudam na previsão.
 
-**Onde mostrar:** dicionário de modelos e importância por permutação.
+**No notebook:** seções 4 e 5 (modelos e comparação) e 6 (importância).
 
-## 11 Efeito de outra divisão treino e teste
+## 11. Outra divisão treino/teste mudaria muito o resultado?
 
-O resultado mudaria. Nas cinco dobras, o MAE da floresta variou de 0,521 a 0,547. Essa faixa mostra sensibilidade à composição da amostra. `random_state=42` permite reprodução, mas não torna a divisão única ou universal.
+**Resposta:** Pode mudar; uma única divisão não diz exatamente quanto. Nas cinco dobras do desenvolvimento, o MAE da floresta variou de 0,521 a 0,547. O teste deu 0,529, dentro dessa faixa. Para medir melhor a variação, repetiríamos a avaliação com outras divisões e novos dados.
 
-**Onde mostrar:** colunas “pior dobra” e “melhor dobra” da comparação.
+**No notebook:** seção 5, colunas de melhor e pior dobra e MAE do teste.
 
-## 12 Onde o modelo não deve ser usado
+## 12. Para que este modelo não deve ser usado? Por quê?
 
-O modelo não deve decidir qualidade comercial, aprovar ou rejeitar lotes, certificar segurança sanitária, estimar preço ou orientar alterações químicas como se a importância fosse causal. Também não deve ser aplicado a outras regiões, variedades, safras, períodos ou laboratórios sem validação externa.
+**Resposta:** Não deve aprovar lotes, definir preço, certificar segurança ou orientar mudanças químicas. A base não tem safra, produtor, variedade nem condições de armazenamento, e os erros aumentam em notas extremas. Mesmo com bom resultado neste teste, outro contexto exigiria nova validação.
 
-**Onde mostrar:** seção de limitações e restrições.
+**No notebook:** seção 8, uso, limitações e restrições; seção 6, erros por nota.
 
-## 13 Modelos testados e escolha sem usar o teste
+## 13. Quais modelos testamos e como escolhemos sem usar o teste?
 
-Testamos referência pela mediana, regressão linear, k-NN, árvore e floresta. Todos usaram as mesmas cinco dobras e o mesmo MAE. Escolhemos a floresta porque teve o menor MAE médio na validação (0,531). k-NN (0,550), regressão linear (0,565), árvore (0,582) e mediana (0,643) erraram mais. A escolha foi registrada antes da célula de teste.
+**Resposta:** Testamos mediana (MAE 0,643), regressão linear (0,565), k-NN (0,550), árvore (0,582) e floresta (0,531) nas mesmas cinco dobras do desenvolvimento. Escolhemos a floresta porque teve o menor MAE médio. Entre 100 e 350 árvores, o MAE caiu de 0,533 para 0,531; a melhora foi pequena, mas 350 foi a melhor configuração testada. Só depois avaliamos o modelo no teste reservado.
 
-**Onde mostrar:** comparação antes do teste, frase “Escolha congelada antes do teste” e tabela final.
+**No notebook:** seção 4 (ajuste de parâmetros), seção 5 (comparação e escolha) e avaliação final.
 
-## 14 Proxy e diferenças entre grupos (Aula 7)
+## Se vier uma pergunta de continuação sobre o tipo de vinho
 
-As 11 medidas químicas preveem o tipo do vinho com AUC média de 0,996 nas cinco dobras do desenvolvimento. Portanto, retirar wine_type não elimina essa informação. A floresta teve MAE médio de 0,531 com a coluna e 0,531 sem ela: a diferença foi inferior a 0,001 ponto de nota. Isso não justifica descartar automaticamente a variável.
+As medidas químicas quase identificam se o vinho é tinto ou branco (AUC 0,996 no desenvolvimento). Tirar `wine_type` quase não mudou o MAE médio da floresta: 0,531 com a coluna e 0,531 sem ela, diferença inferior a 0,001. Isso não prova que a coluna seja inútil, pois a informação pode estar repetida nas outras medidas. No teste, o MAE foi 0,453 para tintos (267 casos) e 0,554 para brancos (797 casos); é uma diferença descritiva que precisa de nova validação.
 
-No teste, o MAE foi 0,453 em tintos (n=267) e 0,554 em brancos (n=797). A diferença exige cautela e nova validação; ela não comprova discriminação. Wine_type não é um atributo pessoal sensível, e a base não contém dados demográficos.
-
-**Onde mostrar:** auditoria de variáveis e proxies no notebook e página 5 do relatório.
-
-## Responsáveis pelas seis seções
-
-| Responsável | Seções |
-| --- | --- |
-| Daniel Gil | 1 Objetivo da modelagem e 6 Restrições de uso |
-| Bruno Pimentel | 2 Dados utilizados |
-| Bruno Groppo | 3 Desempenho e comparação |
-| Wallace Jardim | 4 Uso pretendido |
-| Reynato Junior | 5 Limitações |
-
-Todos devem entender o projeto completo, pois o banco permite perguntas de continuação como “por quê?”, “e se?” e “mostre no notebook”.
+**No notebook:** seção 7, auditoria de variáveis, proxies e diferenças entre tipos.
