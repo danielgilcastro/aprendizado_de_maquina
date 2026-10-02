@@ -1,5 +1,5 @@
 {
-  "data_execucao": "2026-10-01",
+  "data_execucao": "2026-10-02",
   "random_state": 42,
   "linhas_originais": 6497,
   "duplicatas_removidas": 1177,
@@ -18,7 +18,6 @@
   "diferenca_MAE_sem_menos_com": -0.00033529417791511307,
   "mae_teste_modelo": 0.5288882921589689,
   "rmse_teste_modelo": 0.683710025154115,
-  "r2_teste_modelo": 0.39649751487063467,
   "mae_teste_referencia": 0.6428571428571429,
   "reducao_mae_referencia": 0.17728487886382616,
   "triagem_sensibilidade": 0.8168316831683168,

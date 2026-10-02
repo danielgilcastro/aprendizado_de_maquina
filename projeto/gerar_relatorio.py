@@ -25,6 +25,7 @@ DESTINO = PROJETO / "relatorio_qualidade_vinhos.pdf"
 
 resumo = json.loads((RESULTADOS / "resumo_metricas.json").read_text(encoding="utf-8"))
 comparacao = pd.read_csv(RESULTADOS / "comparacao_validacao.csv")
+ajustes = pd.read_csv(RESULTADOS / "ajustes_modelos.csv")
 teste = pd.read_csv(RESULTADOS / "comparacao_teste.csv")
 arvore = pd.read_csv(RESULTADOS / "curva_arvore.csv")
 cortes = pd.read_csv(RESULTADOS / "curva_corte.csv")
@@ -33,6 +34,7 @@ erros_tipo = pd.read_csv(RESULTADOS / "erros_por_tipo.csv")
 importancia = pd.read_csv(RESULTADOS / "importancia_permutacao.csv")
 pares_correlacionados = pd.read_csv(RESULTADOS / "pares_correlacionados.csv")
 desempenho_tipo = pd.read_csv(RESULTADOS / "desempenho_tipo.csv")
+mae_100_arvores = float(ajustes.loc[ajustes["parametro"].eq(100), "MAE VC"].iloc[0])
 
 dados = pd.concat(
     [
@@ -40,6 +42,13 @@ dados = pd.concat(
         pd.read_csv(PROJETO / "dados" / "winequality-white.csv", sep=";").assign(wine_type="white"),
     ],
     ignore_index=True,
+)
+base_limpa = dados.drop_duplicates(keep="first")
+exemplo = pd.concat(
+    [
+        base_limpa.loc[base_limpa["wine_type"].eq("red")].head(4),
+        base_limpa.loc[base_limpa["wine_type"].eq("white")].head(4),
+    ]
 )
 
 NAVY = "#17344A"
@@ -128,7 +137,7 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
     fig = pagina(1, "Qualidade de vinhos", "Relatório do projeto • Estudo didático de aprendizado de máquina")
     fig.text(
         0.08, 0.866,
-        "Siglas: MAE = erro absoluto médio; RMSE = raiz do erro quadrático médio; R² = coeficiente de determinação.",
+        "Siglas: MAE = erro absoluto médio; RMSE = raiz do erro quadrático médio.",
         size=7.1, color=MUTED,
     )
     fig.text(
@@ -152,12 +161,12 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
     cabecalho(fig, 0.735, "1", "Objetivo da modelagem")
     paragrafo(
         fig, 0.08, 0.711,
-        "Este projeto usa a qualidade de vinhos para entender as etapas do aprendizado de máquina supervisionado: preparar dados, treinar modelos, comparar resultados em casos inéditos e examinar limitações. A pergunta é qual nota sensorial (quality) pode ser estimada a partir das 11 medidas físico-químicas e do tipo de vinho. A saída é um número; portanto, a tarefa é regressão.",
+        "Queremos estimar a nota sensorial (quality) com 11 medidas químicas e o tipo do vinho. A saída é um número; por isso, usamos regressão. O estudo mostra a limpeza dos dados, o treino, a comparação dos modelos e seus limites.",
     )
     cabecalho(fig, 0.622, "2", "Dados utilizados")
     paragrafo(
         fig, 0.08, 0.599,
-        "Dois CSVs públicos (tinto e branco) trazem 11 medidas e a nota por amostra. Acrescentamos wine_type e usamos cópias locais dos links abaixo.",
+        "Usamos dois CSVs públicos, um de vinhos tintos e outro de brancos. Cada linha tem 11 medidas e uma nota. Acrescentamos wine_type para indicar o tipo.",
         largura=108,
     )
     fig.text(
@@ -171,7 +180,7 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
         size=6.5, color=TEAL,
     )
     tabela(
-        fig, [0.08, 0.414, 0.84, 0.105],
+        fig, [0.08, 0.445, 0.84, 0.084],
         ["Etapa", "Linhas", "Decisão"],
         [
             ["Arquivos originais", "6.497", "11 medidas, tipo e nota"],
@@ -182,38 +191,61 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
         [0.30, 0.14, 0.56],
         7.8,
     )
-    distribuicao = dados["quality"].value_counts().sort_index()
-    ax = fig.add_axes([0.12, 0.125, 0.45, 0.245])
-    sns.barplot(x=distribuicao.index.astype(str), y=distribuicao.values, color=TEAL, ax=ax)
-    titulo_grafico(ax, "Distribuição das notas originais")
-    ax.set(xlabel="Nota", ylabel="Amostras")
-    ax2 = fig.add_axes([0.63, 0.13, 0.27, 0.22])
-    ax2.axis("off")
-    ax2.text(0, 1, "Auditoria", transform=ax2.transAxes, size=10, weight="bold", color=NAVY, va="top")
-    ax2.text(
-        0, 0.82,
-        "Nulos e não finitos: zero;\n"
-        "nenhuma linha saiu por isso.\n\n"
-        "Duplicatas completas: 1.177;\n"
-        "removidas antes da divisão\n"
-        "para evitar cópias em treino\n"
-        "e teste.\n\n"
-        "Sem identificador, algumas\n"
-        "podem ser amostras legítimas.",
-        transform=ax2.transAxes, size=8.0, color=INK, va="top", linespacing=1.35,
+    fig.text(0.08, 0.420, "Exemplo da base limpa: 8 linhas", size=10.5, color=NAVY, weight="bold")
+    fig.text(
+        0.08, 0.402,
+        "Quatro tintos e quatro brancos, após retirar duplicatas. As 13 colunas aparecem em dois blocos.",
+        size=7.5, color=MUTED,
     )
+    colunas_a = ["wine_type", "quality", "fixed acidity", "volatile acidity", "citric acid", "residual sugar"]
+    colunas_b = ["chlorides", "free sulfur dioxide", "total sulfur dioxide", "density", "pH", "sulphates", "alcohol"]
+    linhas_a = [
+        [str(idx), row["wine_type"], str(int(row["quality"]))]
+        + [f"{row[col]:.2f}" for col in colunas_a[2:]]
+        for idx, row in exemplo.iterrows()
+    ]
+    linhas_b = [
+        [str(idx), f"{row['chlorides']:.3f}", f"{row['free sulfur dioxide']:.0f}",
+         f"{row['total sulfur dioxide']:.0f}", f"{row['density']:.4f}",
+         f"{row['pH']:.2f}", f"{row['sulphates']:.2f}", f"{row['alcohol']:.1f}"]
+        for idx, row in exemplo.iterrows()
+    ]
+    tabela(
+        fig, [0.08, 0.247, 0.84, 0.140],
+        ["linha", *colunas_a], linhas_a,
+        [0.08, 0.12, 0.08, 0.16, 0.19, 0.15, 0.22], 6.2,
+    )
+    tabela(
+        fig, [0.08, 0.084, 0.84, 0.140],
+        ["linha", "chlorides", "free SO2", "total SO2", "density", "pH", "sulphates", "alcohol"],
+        linhas_b, [0.08, 0.15, 0.14, 0.14, 0.14, 0.07, 0.14, 0.14], 6.2,
+    )
+    fig.text(0.08, 0.070, "SO2 = dióxido de enxofre. Não havia valores ausentes ou não finitos.",
+             size=7, color=MUTED)
     pdf.savefig(fig)
     plt.close(fig)
 
     # Página 2 — método, comparação e curva de sobreajuste.
     fig = pagina(
         2, "Desempenho e comparação",
-        f"Escolha antes do teste: {resumo['modelo_escolhido'].lower()} com {resumo['n_arvores_escolhido']} árvores",
+        "Comparação pela média do erro absoluto (MAE): menor é melhor",
     )
-    cabecalho(fig, 0.849, "3", "Métrica e desenho da avaliação")
+    fig.add_artist(plt.Rectangle((0.08, 0.789), 0.84, 0.078,
+                                 transform=fig.transFigure, color=LIGHT, ec="none"))
+    fig.text(0.095, 0.846,
+             f"Modelo escolhido: {resumo['modelo_escolhido']} ({resumo['n_arvores_escolhido']} árvores)",
+             size=11, color=NAVY, weight="bold")
+    fig.text(0.095, 0.823,
+             f"Por quê? Foi o menor MAE entre os modelos nas cinco dobras: {resumo['MAE_floresta_com_tipo']:.3f}.",
+             size=8.2, color=INK)
+    fig.text(0.095, 0.801,
+             f"Por que 350 árvores? O MAE caiu de {mae_100_arvores:.3f} (100 árvores) para "
+             f"{resumo['MAE_floresta_com_tipo']:.3f}; escolhemos o menor erro.",
+             size=8.2, color=INK)
+    cabecalho(fig, 0.776, "3", "Métrica e desenho da avaliação")
     paragrafo(
-        fig, 0.08, 0.826,
-        "Reservamos 20% (1.064 casos) para avaliar previsões em dados inéditos, mantendo 80% (4.256) para treinar e escolher o modelo. Assim, o teste tem tamanho útil sem reduzir demais o desenvolvimento. A estratificação preserva a proporção das notas. Todos os candidatos usaram as mesmas cinco dobras; codificação e escala são ajustadas dentro de cada dobra.",
+        fig, 0.08, 0.752,
+        "O MAE mostra, em média, quantos pontos de nota a previsão errou. Usamos 4.256 casos para treinar e comparar nas mesmas cinco dobras. Reservamos 1.064 casos para o teste final. A proporção das notas foi mantida na divisão.",
         largura=108, tamanho=8.2,
     )
     ordem = ["Referência (mediana)", "Regressão linear", "k-NN", "Árvore", "Floresta aleatória"]
@@ -228,17 +260,22 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
                 f"{r['MAE VC']:.3f}",
                 f"{r['melhor dobra']:.3f}–{r['pior dobra']:.3f}",
                 f"{t['MAE teste']:.3f}",
-                f"{t['R² teste']:.3f}",
             ]
         )
     tabela(
-        fig, [0.08, 0.590, 0.84, 0.155],
-        ["Modelo", "MAE VC", "Faixa VC", "MAE teste", "R² teste"],
+        fig, [0.08, 0.574, 0.84, 0.129],
+        ["Modelo", "MAE VC", "Faixa VC", "MAE teste"],
         linhas,
-        [0.34, 0.13, 0.19, 0.18, 0.16],
-        7.4,
+        [0.38, 0.17, 0.23, 0.22],
+        7.6,
     )
-    ax = fig.add_axes([0.26, 0.380, 0.61, 0.178])
+    fig.text(0.08, 0.544, "Por que não os outros?", size=9.5, color=NAVY, weight="bold")
+    paragrafo(
+        fig, 0.08, 0.525,
+        "k-NN (0,550), regressão linear (0,565) e árvore (0,582) erraram mais na validação. A mediana (0,643) foi a referência mais fraca. A escolha foi feita antes de olhar o teste.",
+        largura=108, tamanho=8.0,
+    )
+    ax = fig.add_axes([0.28, 0.311, 0.57, 0.151])
     grafico = comparacao.sort_values("MAE VC", ascending=False)
     sns.barplot(data=grafico, y="modelo", x="MAE VC", color=TEAL, ax=ax)
     titulo_grafico(ax, "MAE médio na validação cruzada")
@@ -247,7 +284,7 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
     for p in ax.patches:
         ax.text(p.get_width() + 0.006, p.get_y() + p.get_height() / 2, f"{p.get_width():.3f}",
                 va="center", size=7, color=INK)
-    ax2 = fig.add_axes([0.16, 0.111, 0.72, 0.170])
+    ax2 = fig.add_axes([0.19, 0.109, 0.67, 0.138])
     sns.lineplot(data=arvore, x="profundidade", y="MAE treino", marker="o", label="Treino", color=RUST, ax=ax2)
     sns.lineplot(data=arvore, x="profundidade", y="MAE VC", marker="o", label="Validação", color=TEAL, ax=ax2)
     ax2.axvline(resumo["profundidade_arvore"], color=NAVY, ls="--", lw=0.9)
@@ -262,9 +299,9 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
     cabecalho(fig, 0.849, "4", "Decisão apoiada pela previsão")
     paragrafo(
         fig, 0.08, 0.823,
-        "O uso pretendido é didático: simular a identificação de amostras com nota real de pelo menos 7 e observar a troca entre sensibilidade e precisão. Com previsões fora da dobra no desenvolvimento, escolhemos o maior corte em décimos que manteve sensibilidade mínima de 75%: 6,0. Uma previsão acima do corte recebe a classificação ilustrativa de 7+.",
+        "Usamos o corte apenas para simular uma triagem de vinhos com nota real 7+. No desenvolvimento, escolhemos 6,0: foi o maior corte que manteve pelo menos 75% de sensibilidade. Previsões de 6,0 ou mais entram na triagem.",
     )
-    ax = fig.add_axes([0.16, 0.435, 0.70, 0.295])
+    ax = fig.add_axes([0.19, 0.455, 0.65, 0.255])
     sns.lineplot(data=cortes, x="corte", y="sensibilidade", color=TEAL, label="Sensibilidade", ax=ax)
     sns.lineplot(data=cortes, x="corte", y="precisão", color=RUST, label="Precisão", ax=ax)
     ax.axvline(resumo["corte"], color=NAVY, lw=1, ls="--", label=f"Corte {resumo['corte']:.1f}")
@@ -289,7 +326,7 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
     )
     paragrafo(
         fig, 0.08, 0.188,
-        "A simulação favorece recuperar os casos 7+. No teste, 37 ficaram abaixo do corte e 204 amostras acima dele não eram 7+. Esses erros mostram que o corte não é uma decisão automática de qualidade. Qualquer novo corte precisaria ser definido e validado em novos dados.",
+        "No teste, 37 vinhos 7+ ficaram fora da triagem e 204 escolhidos não eram 7+. Por isso, a regra não pode decidir qualidade sozinha. Um novo corte exigiria validação em novos dados.",
         largura=107, tamanho=8.4,
     )
     pdf.savefig(fig)
@@ -300,13 +337,13 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
     cabecalho(fig, 0.849, "5", "Onde o modelo erra")
     paragrafo(
         fig, 0.08, 0.825,
-        "A previsão tende ao centro da distribuição e erra mais nas notas extremas. Os grupos de nota 3 e 9 têm apenas 6 e 1 casos no teste; suas médias não são estáveis. Também há diferença entre vinhos tintos e brancos, que exige acompanhamento em novos dados.",
+        "O modelo erra mais nas notas extremas. No teste, só 6 vinhos tiveram nota 3 e só 1 teve nota 9; os erros médios desses grupos são instáveis. O erro também varia entre tintos e brancos.",
     )
-    ax = fig.add_axes([0.13, 0.585, 0.39, 0.162])
+    ax = fig.add_axes([0.14, 0.592, 0.36, 0.145])
     sns.barplot(data=erros_nota, x="nota_real", y="MAE", color=TEAL, ax=ax)
     titulo_grafico(ax, "MAE por nota no teste")
     ax.set(xlabel="Nota real", ylabel="MAE")
-    ax2 = fig.add_axes([0.66, 0.585, 0.25, 0.162])
+    ax2 = fig.add_axes([0.67, 0.592, 0.23, 0.145])
     sns.barplot(data=erros_tipo, x="wine_type", y="MAE", color=RUST, ax=ax2)
     titulo_grafico(ax2, "MAE por tipo")
     ax2.set(xlabel="", ylabel="")
@@ -315,7 +352,7 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
         for patch, n in zip(a.patches, df["n"]):
             a.annotate(f"n={int(n)}", (patch.get_x() + patch.get_width() / 2, patch.get_height()),
                        ha="center", va="bottom", xytext=(0, 2), textcoords="offset points", size=6.2)
-    ax3 = fig.add_axes([0.28, 0.385, 0.62, 0.138])
+    ax3 = fig.add_axes([0.30, 0.393, 0.57, 0.124])
     top = importancia.head(5).sort_values("aumento_MAE")
     ax3.barh(top["variavel"], top["aumento_MAE"], color=TEAL)
     titulo_grafico(ax3, "Importância por permutação: aumento do MAE")
@@ -328,7 +365,7 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
     fig.text(0.08, 0.318, "Colunas e grupos no teste", size=10.5, color=NAVY, weight="bold")
     paragrafo(
         fig, 0.08, 0.294,
-        f"Wine_type teve importância isolada próxima de zero. Isso não prova que o tipo seja irrelevante: as medidas químicas podem carregar a mesma informação. Dióxido de enxofre livre e total têm correlação absoluta de {pares_correlacionados.iloc[0]['correlacao_absoluta']:.3f} no desenvolvimento, outro exemplo de informação compartilhada. O desempenho também varia entre tintos e brancos.",
+        f"wine_type quase não mudou o erro quando embaralhado. As medidas químicas já podem indicar o tipo; por isso, não concluímos que a coluna é inútil. Dióxido de enxofre livre e total têm correlação de {pares_correlacionados.iloc[0]['correlacao_absoluta']:.3f} no desenvolvimento: também repetem parte da informação.",
         largura=108, tamanho=8.1,
     )
     linhas_grupo = []
@@ -360,7 +397,7 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
     fig.text(0.08, 0.849, "O tipo continua nas outras medidas?", size=10.5, color=NAVY, weight="bold")
     paragrafo(
         fig, 0.08, 0.824,
-        "Com apenas as 11 medidas químicas do desenvolvimento, um classificador tentou prever se o vinho era tinto ou branco. Também repetimos as cinco dobras da floresta para prever quality após retirar wine_type. Nenhum desses testes consultou o conjunto reservado para escolher um novo modelo.",
+        "Testamos se as 11 medidas químicas revelam o tipo do vinho. Depois, comparamos o MAE da floresta com e sem wine_type nas mesmas cinco dobras. Usamos só os dados de desenvolvimento para essas verificações.",
         largura=108, tamanho=8.4,
     )
     tabela(
@@ -381,13 +418,13 @@ with PdfPages(DESTINO, metadata={"Title": "Qualidade de vinhos | Relatório do p
     )
     paragrafo(
         fig, 0.08, 0.550,
-        "O tipo é altamente recuperável pelas medidas. Tirar wine_type, portanto, não apaga a informação de estilo. O MAE médio quase não mudou, mas essa pequena diferença não demonstra que a coluna deva ser descartada. Importância por permutação, correlação e este teste de proxy descrevem associações do modelo, não causas. Não há variáveis pessoais sensíveis para avaliar discriminação.",
+        "As medidas quase identificam o tipo do vinho. Retirar wine_type não apaga essa informação. O MAE mudou menos de 0,001, então não há motivo para descartar a coluna por esse teste. Esses resultados mostram associações, não causas. A base não traz dados pessoais sensíveis.",
         largura=108, tamanho=8.2,
     )
     cabecalho(fig, 0.434, "6", "Restrições de uso")
     paragrafo(
         fig, 0.08, 0.409,
-        "O projeto é para compreender aprendizado de máquina. O modelo e o corte não devem decidir qualidade comercial, aprovação de lotes, preço, segurança sanitária ou mudanças químicas. A base não informa safra, produtor, variedade de uva ou armazenamento. Aplicações em outros contextos exigem validação externa e acompanhamento dos erros por grupo.",
+        "O modelo serve para estudo. Não deve aprovar lotes, definir preço ou indicar segurança e mudanças químicas. Faltam safra, produtor, variedade e armazenamento. Antes de usar em outro contexto, seria preciso testar novos dados e acompanhar os erros por grupo.",
         largura=108, tamanho=8.2,
     )
     fig.text(0.08, 0.292, "Reprodução e responsáveis", size=9.4, color=NAVY, weight="bold")

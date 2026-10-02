@@ -4,7 +4,7 @@ Estas respostas usam a execução salva em `projeto_qualidade_vinhos_completo.ip
 
 ## 1 Modelo de referência e ganho
 
-O modelo de referência é um `DummyRegressor` que prevê sempre a mediana do conjunto de desenvolvimento. No teste, seu MAE foi 0,643. A floresta teve MAE 0,529, redução de 0,114 ponto ou 17,7%. O ganho existe, mas o R² de 0,396 mostra que a maior parte da variação individual ainda não foi explicada.
+O modelo de referência é um `DummyRegressor` que prevê sempre a mediana do conjunto de desenvolvimento. No teste, seu MAE foi 0,643. A floresta teve MAE 0,529: errou 0,114 ponto a menos, uma redução de 17,7%.
 
 **Onde mostrar:** tabela final de comparação no notebook.
 
@@ -22,7 +22,7 @@ A finalidade do projeto é estudar as etapas do aprendizado de máquina com uma 
 
 ## 4 Motivo da métrica
 
-O MAE é a métrica principal porque mede a distância média em pontos de nota. Ele é fácil de explicar e não transforma regressão em porcentagem de acertos. RMSE penaliza mais os erros grandes e R² mede quanta variação o modelo explica; ambos aparecem como complementos.
+O MAE é a métrica principal porque mede a distância média em pontos de nota. Ele é fácil de explicar e não transforma regressão em porcentagem de acertos. O RMSE aparece como complemento porque dá mais peso a erros grandes.
 
 **Onde mostrar:** tabela de validação e tabela de teste.
 
@@ -78,7 +78,7 @@ O modelo não deve decidir qualidade comercial, aprovar ou rejeitar lotes, certi
 
 ## 13 Modelos testados e escolha sem usar o teste
 
-Testamos referência pela mediana, regressão linear, k-NN, árvore e floresta. Todos usaram as mesmas cinco dobras e o mesmo MAE. A floresta apresentou o menor MAE médio de validação e foi registrada como escolhida antes da célula de teste. O teste apareceu uma vez depois do congelamento do modelo e do corte.
+Testamos referência pela mediana, regressão linear, k-NN, árvore e floresta. Todos usaram as mesmas cinco dobras e o mesmo MAE. Escolhemos a floresta porque teve o menor MAE médio na validação (0,531). k-NN (0,550), regressão linear (0,565), árvore (0,582) e mediana (0,643) erraram mais. A escolha foi registrada antes da célula de teste.
 
 **Onde mostrar:** comparação antes do teste, frase “Escolha congelada antes do teste” e tabela final.
 
